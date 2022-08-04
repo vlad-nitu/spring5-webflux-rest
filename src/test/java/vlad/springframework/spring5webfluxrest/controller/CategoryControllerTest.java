@@ -12,8 +12,7 @@ import vlad.springframework.spring5webfluxrest.repositories.CategoryRepository;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class CategoryControllerTest {
     private CategoryRepository repository;
@@ -73,5 +72,32 @@ class CategoryControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .equals(dogToSaveMono.block());
+    }
+
+    @Test
+    void patchWithChanges() {
+        when(repository.findById(anyString()))
+                .thenReturn(Mono.just(Category.builder().description("some cat").build()));
+        Mono<Category> dogToSaveMono = Mono.just(Category.builder().description("dog").build());
+        webTestClient.patch()
+                .uri("/api/v1/categories/stringID")
+                .body(dogToSaveMono, Category.class)
+                .exchange()
+                .expectStatus().isOk()
+                .equals(dogToSaveMono.block());
+        verify(repository).save(any(Category.class));
+    }
+    @Test
+    void patchNoChanges() {
+        when(repository.findById(anyString()))
+                .thenReturn(Mono.just(Category.builder().description("some cat").build()));
+        Mono<Category> dogToSaveMono = Mono.just(Category.builder().description("some cat").build());
+        webTestClient.patch()
+                .uri("/api/v1/categories/stringID")
+                .body(dogToSaveMono, Category.class)
+                .exchange()
+                .expectStatus().isOk()
+                .equals(dogToSaveMono.block());
+        verify(repository, never()).save(any(Category.class));
     }
 }
