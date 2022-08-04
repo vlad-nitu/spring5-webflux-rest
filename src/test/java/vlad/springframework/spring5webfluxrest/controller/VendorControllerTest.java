@@ -93,6 +93,7 @@ class VendorControllerTest {
         verify(repository)
                 .save(captor.capture());
         assertThat(captor.getValue().getId()).isEqualTo("stringID");
+        assertThat(captor.getValue().getFirstName()).isEqualTo("Mara");
     }
 
     @Test
@@ -109,6 +110,6 @@ class VendorControllerTest {
         ArgumentCaptor<Vendor> captor = ArgumentCaptor.forClass(Vendor.class);
         verify(repository)
                 .save(captor.capture());
-        assertThat(captor.getValue().getId()).isEqualTo("stringID");
+        assertThat(captor.getValue().getFirstName()).isEqualTo("Mara");
     }
 }
