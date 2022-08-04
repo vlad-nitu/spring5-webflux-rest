@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import vlad.springframework.spring5webfluxrest.domain.Category;
 import vlad.springframework.spring5webfluxrest.domain.Vendor;
 import vlad.springframework.spring5webfluxrest.repositories.VendorRepository;
 
@@ -30,5 +29,10 @@ public class VendorController {
     @ResponseStatus(HttpStatus.CREATED)
     Mono<Void> create(@RequestBody Publisher<Vendor> vendorStream) {
         return vendorRepository.saveAll(vendorStream).then();
+    }
+    @PutMapping("/{id}")
+    Mono<Vendor> update(@PathVariable String id, @RequestBody Vendor vendor){
+        vendor.setId(id);
+        return vendorRepository.save(vendor);
     }
 }

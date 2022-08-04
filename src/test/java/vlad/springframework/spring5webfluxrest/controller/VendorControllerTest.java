@@ -9,7 +9,6 @@ import reactor.core.publisher.Mono;
 import vlad.springframework.spring5webfluxrest.domain.Vendor;
 import vlad.springframework.spring5webfluxrest.repositories.VendorRepository;
 
-import java.util.concurrent.Flow;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -62,5 +61,18 @@ class VendorControllerTest {
                 .body(vendorMono, Vendor.class)
                 .exchange()
                 .expectStatus().isCreated();
+    }
+
+    @Test
+    void update() {
+        when(repository.save(any(Vendor.class)))
+                .thenReturn(Mono.just(Vendor.builder().firstName("Vlad").build()));
+        Mono<Vendor> vendorMono = Mono.just(Vendor.builder().firstName("Mara").build());
+        webTestClient.put()
+                .uri("/api/v1/vendors/stringID")
+                .body(vendorMono, Vendor.class)
+                .exchange()
+                .expectStatus().isOk()
+                .equals(vendorMono.block());
     }
 }

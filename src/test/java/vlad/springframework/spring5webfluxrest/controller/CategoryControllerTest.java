@@ -71,6 +71,7 @@ class CategoryControllerTest {
                 .uri("/api/v1/categories/stringID")
                 .body(dogToSaveMono, Category.class)
                 .exchange()
-                .expectStatus().isOk();
+                .expectStatus().isOk()
+                .equals(dogToSaveMono.block());
     }
 }
