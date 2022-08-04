@@ -24,6 +24,9 @@ public class Bootstrap implements CommandLineRunner {
             loadCategories();
             loadVendors();
         }
+        else {
+            System.out.println("### Data already loaded");
+        }
 
     }
 
