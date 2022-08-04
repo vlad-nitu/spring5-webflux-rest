@@ -2,6 +2,7 @@ package vlad.springframework.spring5webfluxrest.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.reactivestreams.Publisher;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
@@ -10,10 +11,10 @@ import vlad.springframework.spring5webfluxrest.domain.Vendor;
 import vlad.springframework.spring5webfluxrest.repositories.VendorRepository;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class VendorControllerTest {
 
@@ -74,5 +75,40 @@ class VendorControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .equals(vendorMono.block());
+
+    }
+
+    @Test
+    void patchWithChanges() {
+        when(repository.save(any(Vendor.class)))
+                .thenReturn(Mono.just(Vendor.builder().firstName("Vlad").build()));
+        Mono<Vendor> vendorMono = Mono.just(Vendor.builder().firstName("Mara").build());
+        webTestClient.patch()
+                .uri("/api/v1/vendors/stringID")
+                .body(vendorMono, Vendor.class)
+                .exchange()
+                .expectStatus().isOk()
+                .equals(vendorMono.block());
+        ArgumentCaptor<Vendor> captor = ArgumentCaptor.forClass(Vendor.class);
+        verify(repository)
+                .save(captor.capture());
+        assertThat(captor.getValue().getId()).isEqualTo("stringID");
+    }
+
+    @Test
+    void patchNoChanges() {
+        Mono<Vendor> vendorMono = Mono.just(Vendor.builder().firstName("Mara").build());
+        when(repository.save(any(Vendor.class)))
+                .thenReturn(vendorMono); // Patch same Vendor
+        webTestClient.patch()
+                .uri("/api/v1/vendors/stringID")
+                .body(vendorMono, Vendor.class)
+                .exchange()
+                .expectStatus().isOk()
+                .equals(vendorMono.block());
+        ArgumentCaptor<Vendor> captor = ArgumentCaptor.forClass(Vendor.class);
+        verify(repository)
+                .save(captor.capture());
+        assertThat(captor.getValue().getId()).isEqualTo("stringID");
     }
 }

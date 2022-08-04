@@ -16,10 +16,12 @@ public class VendorController {
     public VendorController(VendorRepository vendorRepository) {
         this.vendorRepository = vendorRepository;
     }
+
     @GetMapping
-    Flux<Vendor> getAll(){
+    Flux<Vendor> getAll() {
         return vendorRepository.findAll();
     }
+
     @GetMapping("/{id}")
     Mono<Vendor> getById(@PathVariable String id) {
         return vendorRepository.findById(id);
@@ -30,9 +32,20 @@ public class VendorController {
     Mono<Void> create(@RequestBody Publisher<Vendor> vendorStream) {
         return vendorRepository.saveAll(vendorStream).then();
     }
+
     @PutMapping("/{id}")
-    Mono<Vendor> update(@PathVariable String id, @RequestBody Vendor vendor){
+    Mono<Vendor> update(@PathVariable String id, @RequestBody Vendor vendor) {
         vendor.setId(id);
         return vendorRepository.save(vendor);
+    }
+
+    @PatchMapping("/{id}")
+    Mono<Vendor> patch(@PathVariable String id, @RequestBody Vendor vendor) {
+        Vendor patchedVendor = Vendor.builder()
+                .id(id)
+                .firstName(vendor.getFirstName())
+                .lastName(vendor.getLastName())
+                .build();
+        return vendorRepository.save(patchedVendor);
     }
 }
