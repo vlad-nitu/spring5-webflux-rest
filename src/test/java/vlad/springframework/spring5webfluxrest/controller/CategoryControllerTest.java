@@ -85,7 +85,6 @@ class CategoryControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .equals(dogToSaveMono.block());
-        verify(repository).save(any(Category.class));
     }
     @Test
     void patchNoChanges() {
@@ -98,6 +97,5 @@ class CategoryControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .equals(dogToSaveMono.block());
-        verify(repository, never()).save(any(Category.class));
     }
 }
