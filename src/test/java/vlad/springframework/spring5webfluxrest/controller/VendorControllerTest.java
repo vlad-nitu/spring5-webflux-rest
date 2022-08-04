@@ -2,12 +2,16 @@ package vlad.springframework.spring5webfluxrest.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.reactivestreams.Publisher;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import vlad.springframework.spring5webfluxrest.domain.Vendor;
 import vlad.springframework.spring5webfluxrest.repositories.VendorRepository;
 
+import java.util.concurrent.Flow;
+
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -46,5 +50,17 @@ class VendorControllerTest {
                 .exchange()
                 .expectBody(Vendor.class)
                 .isEqualTo(vendor);
+    }
+
+    @Test
+    void create() {
+        when(repository.saveAll(any(Publisher.class)))
+                .thenReturn(Flux.just(Vendor.builder().firstName("Vlad").build()));
+        Mono<Vendor> vendorMono = Mono.just(Vendor.builder().firstName("Mara").build());
+        webTestClient.post()
+                .uri("/api/v1/vendors")
+                .body(vendorMono, Vendor.class)
+                .exchange()
+                .expectStatus().isCreated();
     }
 }
