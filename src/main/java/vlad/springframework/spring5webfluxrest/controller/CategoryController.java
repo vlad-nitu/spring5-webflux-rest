@@ -17,10 +17,12 @@ public class CategoryController {
     public CategoryController(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
     }
+
     @GetMapping()
     Flux<Category> getAll() {
         return categoryRepository.findAll();
     }
+
     @GetMapping("{id}")
     Mono<Category> getById(@PathVariable String id) {
         return categoryRepository.findById(id);
