@@ -22,13 +22,20 @@ public class CategoryController {
         return categoryRepository.findAll();
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     Mono<Category> getById(@PathVariable String id) {
         return categoryRepository.findById(id);
     }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    Mono<Void> create(@RequestBody Publisher<Category> categoryStream){
+    Mono<Void> create(@RequestBody Publisher<Category> categoryStream) {
         return categoryRepository.saveAll(categoryStream).then();
+    }
+
+    @PutMapping("/{id}")
+    Mono<Category> update(@PathVariable String id, @RequestBody Category category) {
+        category.setId(id);
+        return categoryRepository.save(category);
     }
 }

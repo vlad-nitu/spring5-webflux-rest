@@ -61,4 +61,16 @@ class CategoryControllerTest {
                 .exchange()
                 .expectStatus().isCreated();
     }
+
+    @Test
+    void update() {
+        when(repository.save(any(Category.class)))
+                .thenReturn(Mono.just(Category.builder().description("some cat").build()));
+        Mono<Category> dogToSaveMono = Mono.just(Category.builder().description("dog").build());
+        webTestClient.put()
+                .uri("/api/v1/categories/stringID")
+                .body(dogToSaveMono, Category.class)
+                .exchange()
+                .expectStatus().isOk();
+    }
 }
