@@ -18,7 +18,7 @@ public class CategoryController {
         this.categoryRepository = categoryRepository;
     }
     @GetMapping()
-    Flux<Category> list() {
+    Flux<Category> getAll() {
         return categoryRepository.findAll();
     }
     @GetMapping("{id}")
