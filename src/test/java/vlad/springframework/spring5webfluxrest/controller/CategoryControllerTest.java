@@ -2,12 +2,15 @@ package vlad.springframework.spring5webfluxrest.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.reactivestreams.Publisher;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import vlad.springframework.spring5webfluxrest.domain.Category;
 import vlad.springframework.spring5webfluxrest.repositories.CategoryRepository;
 
+
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -45,5 +48,17 @@ class CategoryControllerTest {
                 .exchange()
                 .expectBody(Category.class)
                 .isEqualTo(cat);
+    }
+
+    @Test
+    void create() {
+        when(repository.saveAll(any(Publisher.class)))
+                .thenReturn(Flux.just(Category.builder().build()));
+        Mono<Category> catToSaveMono = Mono.just(Category.builder().description("some cat").build());
+        webTestClient.post()
+                .uri("/api/v1/categories")
+                .body(catToSaveMono, Category.class)
+                .exchange()
+                .expectStatus().isCreated();
     }
 }
